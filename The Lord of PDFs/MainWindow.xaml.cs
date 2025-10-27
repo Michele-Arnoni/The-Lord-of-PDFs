@@ -180,8 +180,8 @@ namespace The_Lord_of_PDFs
 
             for (int i=0; Directory.Exists(newFolderPath); i++) //ensure unique folder name
             {
-                newFolderPath = Path.Combine(parentPath, folderName); //reset to base name
-                newFolderPath = Path.Combine(parentPath, folderName + " " + i.ToString()); //append number to name and try again
+                folderName = "New Folder " + i.ToString();
+                newFolderPath = Path.Combine(parentPath, folderName); //append number to name and try again
             }
 
             try
