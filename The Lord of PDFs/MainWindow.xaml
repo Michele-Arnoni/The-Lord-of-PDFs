@@ -9,15 +9,41 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" MinWidth="150" MaxWidth="500"/>
-
             <ColumnDefinition Width="5"/>
-
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView x:Name="fileTreeView" Grid.Column="0" Margin="5">
-        </TreeView>
 
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ToolBar Grid.Row="0" Margin="5,0,5,0">
+                <Button x:Name="btnNewFolder" Click="BtnNewFolder_Click" ToolTip="Crea Nuova Cartella">
+                    <TextBlock Text="➕" FontSize="14" />
+                </Button>
+
+                <Button x:Name="btnImport" Click="BtnImport_Click" ToolTip="Importa PDF">
+                    <TextBlock Text="📥" FontSize="14" />
+                </Button>
+
+                <Button x:Name="btnScan" Click="BtnScan_Click" ToolTip="Scansiona PDF">
+                    <TextBlock Text="📸" FontSize="14" />
+                </Button>
+
+                <Separator />
+
+                <Button x:Name="btnDelete" Click="BtnDelete_Click" ToolTip="Elimina Selezionato">
+                    <TextBlock Text="❌" FontSize="14" />
+                </Button>
+            </ToolBar>
+
+            <TreeView x:Name="fileTreeView" Grid.Row="1" Margin="5">
+            </TreeView>
+
+        </Grid>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Gainsboro" />
 
         <Grid Grid.Column="2">

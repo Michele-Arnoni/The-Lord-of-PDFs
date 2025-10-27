@@ -129,5 +129,101 @@ namespace The_Lord_of_PDFs
 
             return stack;
         }
+
+        private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            /* Placeholder for "Create New Folder" functionality
+            
+             -three cases to handle:
+                1) No node selected: create the new folder in the VAULT root
+                2) Folder node selected: create the new folder inside the selected folder   
+                3) File node selected: create the new folder in the parent folder of the selected file
+
+             -Define a name for the new folder, ensuring it does not conflict with existing folders
+
+             -Create the new folder in the determined location 
+
+             -update UI (TreeView) to reflect the new folder creation, 
+                !!! ATTENTION: we can't refresh all TreeView with LoadVaultContents() because it would collapse all folders !!!
+             */
+
+            TreeViewItem parentNode = fileTreeView.Items[0] as TreeViewItem;
+            if (parentNode == null)
+            {
+                MessageBox.Show("Error: ROOT NODE NOT FOUND");
+                return;
+            }
+
+            string parentPath = parentNode.Tag.ToString(); //default to VAULT root path
+
+            TreeViewItem selectedItem = fileTreeView.SelectedItem as TreeViewItem; //get the selected item in the TreeView
+            if (selectedItem != null)
+            {
+                string selectedPath = selectedItem.Tag.ToString(); //get the path of the selected item
+                FileAttributes attrs = File.GetAttributes(selectedPath);
+
+                if (attrs.HasFlag(FileAttributes.Directory)) // if item selected is a directory
+                {
+                    parentPath = selectedPath; //set parentPath to the selected directory
+                    parentNode = selectedItem; //update parentNode to the selected directory node
+                }
+                else
+                {
+                    // if item selected is a file
+                    parentPath = Path.GetDirectoryName(selectedPath); //get the parent directory of the file
+                    parentNode = selectedItem.Parent as TreeViewItem; //update parentNode to the parent directory node
+                }
+            }
+
+            string folderName = "New Folder";
+            string newFolderPath = Path.Combine(parentPath, folderName);
+
+            for (int i=0; Directory.Exists(newFolderPath); i++) //ensure unique folder name
+            {
+                newFolderPath = Path.Combine(parentPath, folderName); //reset to base name
+                newFolderPath = Path.Combine(parentPath, folderName + " " + i.ToString()); //append number to name and try again
+            }
+
+            try
+            {
+                Directory.CreateDirectory(newFolderPath); //create the new folder
+
+                //update the TreeView to reflect the new folder creation
+                TreeViewItem newDirNode = new TreeViewItem
+                {
+                    Header = CreateHeaderStackPanel(folderName, "folderICON.png"), 
+                    Tag = newFolderPath
+                };
+                parentNode.Items.Add(newDirNode); //adding the new folder node to the parent node
+                parentNode.IsExpanded = true; //expand the parent node to show the new folder
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error during new folter creation: {ex.Message}");
+            }
+        }
+
+        private void refreshFolder(string newFolderPath)
+        {
+
+        }
+
+        private void BtnImport_Click(object sender, RoutedEventArgs e)
+        {
+            // Placeholder for "Import PDF" functionality
+            MessageBox.Show("Logica 'Importa PDF' da implementare.");
+        }
+
+        private void BtnScan_Click(object sender, RoutedEventArgs e)
+        {
+            // Placeholder for "Scan PDF" functionality
+            MessageBox.Show("Logica 'Scansiona' da implementare.");
+        }
+
+        private void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            // Placeholder for "Delete" functionality
+            MessageBox.Show("Logica 'Elimina' da implementare.");
+        }
     }
 }
