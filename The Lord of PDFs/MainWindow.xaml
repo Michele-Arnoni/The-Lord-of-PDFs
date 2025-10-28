@@ -21,21 +21,21 @@
             </Grid.RowDefinitions>
 
             <ToolBar Grid.Row="0" Margin="5,0,5,0">
-                <Button x:Name="btnNewFolder" Click="BtnNewFolder_Click" ToolTip="Crea Nuova Cartella">
+                <Button x:Name="btnNewFolder" Click="BtnNewFolder_Click" ToolTip="New Folder">
                     <TextBlock Text="➕" FontSize="14" />
                 </Button>
 
-                <Button x:Name="btnImport" Click="BtnImport_Click" ToolTip="Importa PDF">
+                <Button x:Name="btnImport" Click="BtnImport_Click" ToolTip="Import PDF">
                     <TextBlock Text="📥" FontSize="14" />
                 </Button>
 
-                <Button x:Name="btnScan" Click="BtnScan_Click" ToolTip="Scansiona PDF">
+                <Button x:Name="btnScan" Click="BtnScan_Click" ToolTip="Scan document to PDF">
                     <TextBlock Text="📸" FontSize="14" />
                 </Button>
 
                 <Separator />
 
-                <Button x:Name="btnDelete" Click="BtnDelete_Click" ToolTip="Elimina Selezionato">
+                <Button x:Name="btnDelete" Click="BtnDelete_Click" ToolTip="Delete">
                     <TextBlock Text="❌" FontSize="14" />
                 </Button>
             </ToolBar>
@@ -47,10 +47,10 @@
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Gainsboro" />
 
         <Grid Grid.Column="2">
-            <TextBlock Text="PDF work area" 
+            <TextBlock Text="no document selected" 
                        HorizontalAlignment="Center" 
                        VerticalAlignment="Center" 
-                       FontSize="24" 
+                       FontSize="20" 
                        Foreground="Gray"/>
         </Grid>
     </Grid>
