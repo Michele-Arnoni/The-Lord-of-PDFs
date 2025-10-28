@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 
 
 namespace The_Lord_of_PDFs
@@ -206,7 +207,79 @@ namespace The_Lord_of_PDFs
         private void BtnImport_Click(object sender, RoutedEventArgs e)
         {
             // Placeholder for "Import PDF" functionality
-            MessageBox.Show("Logica 'Importa PDF' da implementare.");
+            
+            OpenFileDialog openDialog = new OpenFileDialog //create an OpenFileDialog to select PDF files
+            {
+                Title = "Import PDF in your CASTLE",
+                Filter = "File PDF (*.pdf)|*.pdf", //show only .pdf
+                Multiselect = true // you can select multiple files
+            };
+
+            if (openDialog.ShowDialog() == true)
+            {
+                // Determine the destination directory based on the selected node
+
+                // Default: vault root
+                TreeViewItem parentNode = fileTreeView.Items[0] as TreeViewItem;
+                string parentPath = parentNode.Tag.ToString();
+
+                TreeViewItem selectedItem = fileTreeView.SelectedItem as TreeViewItem;
+                if (selectedItem != null)
+                {
+                    string selectedPath = selectedItem.Tag.ToString();
+                    FileAttributes attrs = File.GetAttributes(selectedPath);
+
+                    if (attrs.HasFlag(FileAttributes.Directory)) // destination: folder selected
+                    {
+                        parentPath = selectedPath;
+                        parentNode = selectedItem;
+                    }
+                    else // destination: parent of file selected
+                    {
+                        parentPath = Path.GetDirectoryName(selectedPath);
+                        parentNode = selectedItem.Parent as TreeViewItem;
+                    }
+                }
+
+                // Iterate through selected files and copy them to the destination directory
+                try
+                {
+                    foreach (string sourceFilePath in openDialog.FileNames) 
+                    {
+                        // find a unique name to avoid overwriting existing files
+                        string baseName = Path.GetFileNameWithoutExtension(sourceFilePath);
+                        string extension = Path.GetExtension(sourceFilePath);
+                        string destFileName = Path.GetFileName(sourceFilePath); 
+                        string destFilePath = Path.Combine(parentPath, destFileName);
+                        int counter = 1;
+
+                        while (File.Exists(destFilePath))
+                        {
+                            destFileName = $"{baseName} ({counter}){extension}";
+                            destFilePath = Path.Combine(parentPath, destFileName);
+                            counter++;
+                        }
+
+                        // copy the file to the destination
+                        File.Copy(sourceFilePath, destFilePath);
+
+                        // update the TreeView to reflect the new file
+                        TreeViewItem newFileNode = new TreeViewItem
+                        {
+                            Header = CreateHeaderStackPanel(destFileName, "pdfICON.png"),
+                            Tag = destFilePath
+                        };
+                        parentNode.Items.Add(newFileNode);
+                    }
+
+                    // expand the parent node to show the newly imported files
+                    parentNode.IsExpanded = true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante l'importazione dei file: {ex.Message}", "Errore di importazione");
+                }
+            }
         }
 
         private void BtnScan_Click(object sender, RoutedEventArgs e)
