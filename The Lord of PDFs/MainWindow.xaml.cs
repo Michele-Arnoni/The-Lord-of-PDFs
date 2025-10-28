@@ -203,6 +203,11 @@ namespace The_Lord_of_PDFs
             }
         }
 
+        private void refreshFolder(string newFolderPath)
+        {
+
+        }
+
         private void BtnImport_Click(object sender, RoutedEventArgs e)
         {
             // Placeholder for "Import PDF" functionality
@@ -218,73 +223,7 @@ namespace The_Lord_of_PDFs
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
             // Placeholder for "Delete" functionality
-
-            TreeViewItem selectedItem = fileTreeView.SelectedItem as TreeViewItem; //get the selected item in the TreeView
-
-            if (selectedItem == null || selectedItem.Tag.ToString() == vaultPath) return; //no item selected or item selected is the ROOT path (the vault), exit
-
-            string itemName = " ";
-            if (selectedItem.Header is StackPanel headerPanel)
-            {
-                var textBlock = headerPanel.Children.OfType<TextBlock>().FirstOrDefault();
-                if (textBlock != null)
-                {
-                    itemName = textBlock.Text;
-                }
-            }
-            MessageBoxResult result = MessageBox.Show(
-                $"Do you want delete: '{itemName}'?\nThis operation cannot be undone.",
-                "Confirm? ",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (result == MessageBoxResult.No)
-            {
-                return; // user cancelled the deletion
-            }
-
-            /*
-             * Proceed with deletion:
-             * 
-             * We need to find the parent of the selected item to remove it from the TreeView after deletion.
-             * 
-             * the TreeView structure is a hierarchy of TreeViewItems
-             */
-            try
-            {
-                FileAttributes attrs = File.GetAttributes(selectedItem.Tag.ToString());
-                if (attrs.HasFlag(FileAttributes.Directory))
-                {
-                    //selected item is a directory
-                    Directory.Delete(selectedItem.Tag.ToString(), true); //delete the directory and its contents
-                }
-                else
-                {
-                    File.Delete(selectedItem.Tag.ToString()); //delete the file
-                }
-
-                /*
-                 * ItemsControl is the base class for controls that contain a collection of items, TreeViewItem derives from ItemsControl
-                 * 
-                 * why? Because the Parent of selectedItem could be another TreeViewItem (if it's inside a folder) or the TreeView itself (if it's in the root)
-                 * for this reason we use ItemsControl as the type for parent, is more generic
-                 * 
-                 */
-                ItemsControl parent = selectedItem.Parent as ItemsControl; //get the parent of the selected item
-                if (parent != null) {
-                    parent.Items.Remove(selectedItem); //remove the selected item from its parent
-                    return;
-                } 
-                else
-                {
-                    fileTreeView.Items.Remove(selectedItem); //fallback, should not happen because root is not deletable
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error during deletion: {ex.Message}");
-                return;
-            }
+            MessageBox.Show("Logica 'Elimina' da implementare.");
         }
     }
 }
