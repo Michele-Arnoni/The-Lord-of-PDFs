@@ -43,6 +43,9 @@ namespace The_Lord_of_PDFs
             }
             // Load existing PDF files into the TreeView
             LoadVaultContents();
+
+            // Show placeholder text in the PDF viewer initially
+            ShowPlaceholder(true);
         }
 
         // Method to load PDF files from the VAULT directory into the TreeView
@@ -546,6 +549,71 @@ namespace The_Lord_of_PDFs
                 MessageBox.Show($"drag & drop error: {ex.Message}", "Error");
                 // if error occurs, reload the vault contents to ensure UI consistency
                 LoadVaultContents();
+            }
+        }
+
+
+
+        // Helper method to show/hide the placeholder text in the PDF viewer
+        private void FileTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            // GET the selected item
+            TreeViewItem selectedItem = fileTreeView.SelectedItem as TreeViewItem;
+
+            if (selectedItem == null || selectedItem.Tag == null)
+            {
+                // no item selected
+                ShowPlaceholder(true);
+                return;
+            }
+
+            string path = selectedItem.Tag.ToString();
+            FileAttributes attrs;
+
+            try
+            {
+                attrs = File.GetAttributes(path);
+            }
+            catch (Exception)
+            {
+                // error getting attributes, show placeholder
+                ShowPlaceholder(true);
+                return;
+            }
+
+
+            // check if it's a file or directory
+            if (!attrs.HasFlag(FileAttributes.Directory))
+            {
+                // selected item is a file so we can try to display it
+                ShowPlaceholder(false); // hide the placeholder text
+
+                // load the PDF file in the WebView
+                // note: WebView control can display PDF files directly
+                pdfWebView.Source = new Uri($"file:///{path}");
+            }
+            else
+            {
+                // selected item is a directory
+                ShowPlaceholder(true); // show the placeholder text
+            }
+        }
+
+        /// <summary>
+        /// function to show or hide the placeholder text in the PDF viewer 
+        /// </summary>
+        private void ShowPlaceholder(bool show)
+        {
+            if (show)
+            {
+                placeholderText.Visibility = Visibility.Visible;
+                pdfWebView.Source = new Uri("about:blank"); // clear the WebView
+                pdfWebView.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                placeholderText.Visibility = Visibility.Collapsed;
+                pdfWebView.Visibility = Visibility.Visible;
             }
         }
     }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:The_Lord_of_PDFs"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="The Lord of PDFs" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
@@ -45,18 +46,22 @@
                 PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
                 PreviewMouseMove="TreeView_PreviewMouseMove"
                 Drop="TreeView_Drop"
-                DragOver="TreeView_DragOver">
+                DragOver="TreeView_DragOver"
+                SelectedItemChanged="FileTreeView_SelectedItemChanged">
             </TreeView>
 
         </Grid>
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Gainsboro" />
 
         <Grid Grid.Column="2">
-            <TextBlock Text="no document selected" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center" 
-                       FontSize="20" 
-                       Foreground="Gray"/>
+            <wv2:WebView2 x:Name="pdfWebView" />
+
+            <TextBlock x:Name="placeholderText" 
+               Text="no document selected" 
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center" 
+               FontSize="20" 
+               Foreground="Gray" />
         </Grid>
     </Grid>
 </Window>
