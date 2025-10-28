@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
+using System.Collections.Generic;
 
 
 namespace The_Lord_of_PDFs
@@ -22,6 +23,10 @@ namespace The_Lord_of_PDFs
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "My CASTLE"
             );
+
+        // Fields for drag-and-drop functionality 
+        private TreeViewItem _draggedItem = null;
+        private Point _startPoint;
 
         public MainWindow()
         {
@@ -357,6 +362,190 @@ namespace The_Lord_of_PDFs
             {
                 MessageBox.Show($"Error during deletion: {ex.Message}");
                 return;
+            }
+        }
+
+
+        // Methods for drag-and-drop functionality
+
+        //helper method to find ancestor of a specific type in the visual tree
+        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject 
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
+        }
+
+        // helper method to get expanded paths
+        private HashSet<string> GetExpandedPaths(ItemsControl parent)
+        {
+            var paths = new HashSet<string>();
+            foreach (object item in parent.Items)
+            {
+                var tvItem = item as TreeViewItem;
+                if (tvItem != null)
+                {
+                    if (tvItem.IsExpanded)
+                    {
+                        paths.Add(tvItem.Tag.ToString());
+                    }
+                    foreach (var path in GetExpandedPaths(tvItem))
+                    {
+                        paths.Add(path);
+                    }
+                }
+            }
+            return paths;
+        }
+
+        // helper method to set expanded paths
+        private void SetExpandedPaths(ItemsControl parent, HashSet<string> expandedPaths)
+        {
+            foreach (object item in parent.Items)
+            {
+                var tvItem = item as TreeViewItem;
+                if (tvItem != null)
+                {
+                    string path = tvItem.Tag.ToString();
+                    if (expandedPaths.Contains(path))
+                    {
+                        tvItem.IsExpanded = true;
+                    }
+                    SetExpandedPaths(tvItem, expandedPaths);
+                }
+            }
+        }
+
+        // STEP 1 (drag & drop): user starts dragging an item whith mouse left button down
+        private void TreeView_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            // save the start point and the dragged item
+            _startPoint = e.GetPosition(null);
+            _draggedItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+        }
+
+        // STEP 2 (drag & drop): user moves the mouse with left button pressed
+        private void TreeView_PreviewMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            // if left button is not pressed or no item is being dragged, exit
+            if (e.LeftButton == System.Windows.Input.MouseButtonState.Released || _draggedItem == null)
+                return;
+
+            // calculate if the distance of the mouse since the drag started is enough to start a drag-and-drop operation
+            Point currentPosition = e.GetPosition(null);
+            Vector diff = _startPoint - currentPosition;
+
+            if (Math.Abs(diff.X) > 5.0 || Math.Abs(diff.Y) > 5.0)
+            {
+                // start the drag-and-drop operation
+                // _draggedItem is the source of the drag
+                DragDrop.DoDragDrop(_draggedItem, _draggedItem, DragDropEffects.Move);
+                _draggedItem = null; // reset the dragged item after the operation
+            }
+        }
+
+        // STEP 3 (drag & drop): user drags the item over another item
+        private void TreeView_DragOver(object sender, DragEventArgs e)
+        {
+            // find the target item (the one under the mouse)
+            var targetItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+
+            // fin the source item (the one being dragged)
+            var sourceItem = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
+
+            // Default: no drop allowed
+            e.Effects = DragDropEffects.None;
+
+            if (targetItem == null || sourceItem == null || targetItem == sourceItem)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            // check if the target item is a directory
+            string targetPath = targetItem.Tag.ToString();
+            FileAttributes attrs = File.GetAttributes(targetPath);
+
+            if (attrs.HasFlag(FileAttributes.Directory))
+            {
+                // if target is a directory, allow drop
+                e.Effects = DragDropEffects.Move;
+            }
+
+            e.Handled = true;
+        }
+
+
+        // STEP 4 (drag & drop): user drops the item
+        private void TreeView_Drop(object sender, DragEventArgs e)
+        {
+            var targetItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+            var sourceItem = e.Data.GetData(typeof(TreeViewItem)) as TreeViewItem;
+
+            // Basic validation
+            if (targetItem == null || sourceItem == null || targetItem == sourceItem)
+                return;
+
+            string sourcePath = sourceItem.Tag.ToString();
+            string targetPath = targetItem.Tag.ToString();
+
+            // check if target is a directory
+            FileAttributes attrs = File.GetAttributes(targetPath);
+            if (!attrs.HasFlag(FileAttributes.Directory))
+            {
+                // if target is not a directory, set target to its parent directory
+                targetPath = Path.GetDirectoryName(targetPath);
+            }
+
+            // you cannot move the vault root
+            if (sourcePath == vaultPath)
+            {
+                return;
+            }
+
+            try
+            {
+                // save expanded paths
+                HashSet<string> expandedPaths = GetExpandedPaths(fileTreeView);
+
+                // execute the move operation on disk
+                string destPath = Path.Combine(targetPath, Path.GetFileName(sourcePath));
+
+                // make sure we are not overwriting existing files/folders
+                if (File.Exists(destPath) || Directory.Exists(destPath))
+                {
+                    MessageBox.Show($"A file or folder with the name: '{Path.GetFileName(sourcePath)}' already exist in this destination.", "Conflict");
+                    return;
+                }
+
+                // move the file or directory
+                if (File.GetAttributes(sourcePath).HasFlag(FileAttributes.Directory))
+                {
+                    Directory.Move(sourcePath, destPath);
+                }
+                else
+                {
+                    File.Move(sourcePath, destPath);
+                }
+
+                // update the TreeView
+                LoadVaultContents();
+
+                // restore expanded paths
+                SetExpandedPaths(fileTreeView, expandedPaths);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"drag & drop error: {ex.Message}", "Error");
+                // if error occurs, reload the vault contents to ensure UI consistency
+                LoadVaultContents();
             }
         }
     }

@@ -40,7 +40,12 @@
                 </Button>
             </ToolBar>
 
-            <TreeView x:Name="fileTreeView" Grid.Row="1" Margin="5">
+            <TreeView x:Name="fileTreeView" Grid.Row="1" Margin="5"
+                AllowDrop="True"
+                PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
+                PreviewMouseMove="TreeView_PreviewMouseMove"
+                Drop="TreeView_Drop"
+                DragOver="TreeView_DragOver">
             </TreeView>
 
         </Grid>
