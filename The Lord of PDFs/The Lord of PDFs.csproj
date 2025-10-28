@@ -11,8 +11,12 @@
 
   <ItemGroup>
     <None Remove="Assets\castleICON.png" />
+    <None Remove="Assets\flameICON.png" />
     <None Remove="Assets\folderICON.png" />
+    <None Remove="Assets\importpdfICON.png" />
+    <None Remove="Assets\newfolderICON.png" />
     <None Remove="Assets\pdfICON.png" />
+    <None Remove="Assets\scannerICON.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,8 +25,12 @@
 
   <ItemGroup>
     <Resource Include="Assets\castleICON.png" />
+    <Resource Include="Assets\flameICON.png" />
     <Resource Include="Assets\folderICON.png" />
+    <Resource Include="Assets\importpdfICON.png" />
+    <Resource Include="Assets\newfolderICON.png" />
     <Resource Include="Assets\pdfICON.png" />
+    <Resource Include="Assets\scannerICON.png" />
   </ItemGroup>
 
 </Project>
