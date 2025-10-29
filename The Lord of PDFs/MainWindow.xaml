@@ -47,7 +47,13 @@
                 PreviewMouseMove="TreeView_PreviewMouseMove"
                 Drop="TreeView_Drop"
                 DragOver="TreeView_DragOver"
-                SelectedItemChanged="FileTreeView_SelectedItemChanged">
+                SelectedItemChanged="FileTreeView_SelectedItemChanged"
+                ContextMenuOpening="TreeView_ContextMenuOpening">
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Rename" Click="RenameMenuItem_Click" />
+                    </ContextMenu>
+                </TreeView.ContextMenu>
             </TreeView>
 
         </Grid>

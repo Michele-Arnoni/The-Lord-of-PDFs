@@ -6,6 +6,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
 
 
 namespace The_Lord_of_PDFs
@@ -27,6 +29,8 @@ namespace The_Lord_of_PDFs
         // Fields for drag-and-drop functionality 
         private TreeViewItem _draggedItem = null;
         private Point _startPoint;
+
+        private TreeViewItem _rightClickedItem; // Field to store the right-clicked item
 
         public MainWindow()
         {
@@ -614,6 +618,160 @@ namespace The_Lord_of_PDFs
             {
                 placeholderText.Visibility = Visibility.Collapsed;
                 pdfWebView.Visibility = Visibility.Visible;
+            }
+        }
+
+        // Context Menu: RENAME functionality
+        private void TreeView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            // find the item that was right-clicked
+            _rightClickedItem = FindAncestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+
+            /* If no item was right-clicked or if the right-clicked item is the VAULT root,
+             * we prevent the context menu from opening by setting e.Handled = true
+             */
+            if (_rightClickedItem == null || _rightClickedItem.Tag.ToString() == vaultPath)
+            {
+                e.Handled = true; // 'e.Handled = true' prevents the context menu from opening
+            }
+        }
+
+        // Handler for the "Rename" menu item click
+        private void RenameMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_rightClickedItem == null) return;
+
+            // find the StackPanel that is the Header of the TreeViewItem
+            var header = _rightClickedItem.Header as StackPanel;
+            if (header == null) return;
+
+            // find the TextBlock inside the StackPanel
+            var textBlock = header.Children.OfType<TextBlock>().FirstOrDefault();
+            if (textBlock == null) return;
+
+            // create a TextBox to allow renaming
+            var editBox = new TextBox
+            {
+                Text = textBlock.Text, // pre-fill with the current name
+                FontSize = 16,
+                Padding = new Thickness(0),
+                BorderThickness = new Thickness(0)
+            };
+
+            // hide the original TextBlock...
+            header.Visibility = Visibility.Collapsed;
+
+            // ...and set the TextBox as the new Header
+            _rightClickedItem.Header = editBox;
+
+            // focus and select all text in the TextBox
+            editBox.Focus();
+            editBox.SelectAll();
+            editBox.LostFocus += EditBox_LostFocus; // in case the user clicks away
+            editBox.KeyDown += EditBox_KeyDown;     // handle Enter/Esc keys
+        }
+
+        // Handlers for the TextBox events during renaming
+        private void EditBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            var editBox = sender as TextBox;
+            if (e.Key == Key.Enter)
+            {
+                // confirm the rename
+                editBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+            }
+            else if (e.Key == Key.Escape)
+            {
+                // cancel the rename
+                // find the 'TreeViewItem' that contains this TextBox
+                var item = FindAncestor<TreeViewItem>(editBox);
+                if (item != null)
+                {
+                    // the rename is cancelled, so we restore the original header
+                    string originalName = Path.GetFileName(item.Tag.ToString());
+                    bool isDirectory = File.GetAttributes(item.Tag.ToString()).HasFlag(FileAttributes.Directory);
+                    item.Header = CreateHeaderStackPanel(originalName, isDirectory ? "folderICON.png" : "pdfICON.png");
+                }
+            }
+        }
+
+        private void EditBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var editBox = sender as TextBox;
+            // find the 'TreeViewItem' that contains this TextBox
+            var item = FindAncestor<TreeViewItem>(editBox);
+
+            if (item == null)
+            {
+                LoadVaultContents(); // error case, reload everything
+                return;
+            }
+
+            string newName = editBox.Text.Trim(); // new name entered by the user
+            string oldPath = item.Tag.ToString();
+            string oldName = Path.GetFileName(oldPath);
+            string iconName;
+            bool isDirectory;
+
+            try
+            {
+                isDirectory = File.GetAttributes(oldPath).HasFlag(FileAttributes.Directory);
+                iconName = isDirectory ? "folderICON.png" : "pdfICON.png";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error reading the attribute: {ex.Message}");
+                LoadVaultContents(); // error case, reload everything
+                return;
+            }
+
+            // case 1: user entered an empty name or the same name
+            if (string.IsNullOrWhiteSpace(newName) || newName == oldName)
+            {
+                // cancel the rename
+                item.Header = CreateHeaderStackPanel(oldName, iconName);
+                return;
+            }
+
+            // case 2: proceed with renaming
+            try
+            {
+                string parentPath = Path.GetDirectoryName(oldPath);
+                string newPath = Path.Combine(parentPath, newName);
+
+                // check for invalid characters
+                if (newName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                {
+                    MessageBox.Show("Il nome contiene caratteri non validi.", "Errore");
+                    item.Header = CreateHeaderStackPanel(oldName, iconName); // cancel
+                    return;
+                }
+
+                // check for name conflicts
+                if (File.Exists(newPath) || Directory.Exists(newPath))
+                {
+                    MessageBox.Show("Un file o cartella con questo nome esiste già.", "Conflitto");
+                    item.Header = CreateHeaderStackPanel(oldName, iconName); // cancel
+                    return;
+                }
+
+                // --- ok, rename it ! ---
+
+                // rename on disk
+                if (isDirectory)
+                    Directory.Move(oldPath, newPath);
+                else
+                    File.Move(oldPath, newPath);
+
+                // update the TreeViewItem
+                item.Tag = newPath; // update the path
+                item.Header = CreateHeaderStackPanel(newName, iconName); // update the header
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Errore durante la rinomina: {ex.Message}");
+                // on error, reload the vault contents to ensure UI consistency
+                LoadVaultContents();
             }
         }
     }
