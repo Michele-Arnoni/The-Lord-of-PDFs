@@ -1,4 +1,4 @@
-# WELCOME to The Lord of PDFs
+# WELCOME to PDF's castle
 
 
 # MAIN FEATURES:
