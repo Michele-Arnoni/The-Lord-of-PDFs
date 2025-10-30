@@ -1,9 +1,9 @@
-﻿<Window x:Class="The_Lord_of_PDFs.MainWindow"
+﻿<Window x:Class="PDFs_castle.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:The_Lord_of_PDFs"
+        xmlns:local="clr-namespace:PDFs_castle"
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         mc:Ignorable="d"
         Title="The Lord of PDFs" Height="450" Width="800" Loaded="Window_Loaded">
@@ -27,17 +27,17 @@
                 </Button>
 
                 <Button x:Name="btnImport" Click="BtnImport_Click" ToolTip="Import PDF">
-                    <Image Source="/Assets/importpdfICON.png" Width="24" Height="24" />
+                    <Image Source="/Assets/importpdfICON.png" Width="28" Height="28" />
                 </Button>
 
                 <Button x:Name="btnScan" Click="BtnScan_Click" ToolTip="Scan document to PDF">
-                    <Image Source="/Assets/scannerICON.png" Width="24" Height="24" />
+                    <Image Source="/Assets/scannerICON.png" Width="28" Height="28" />
                 </Button>
 
                 <Separator />
 
                 <Button x:Name="btnDelete" Click="BtnDelete_Click" ToolTip="Delete">
-                    <Image Source="/Assets/flameICON.png" Width="24" Height="24" />
+                    <Image Source="/Assets/flameICON.png" Width="28" Height="28" />
                 </Button>
             </ToolBar>
 
@@ -60,14 +60,43 @@
         <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="Gainsboro" />
 
         <Grid Grid.Column="2">
-            <wv2:WebView2 x:Name="pdfWebView" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <ToolBar x:Name="pdfEditorToolBar" Grid.Row="0" Margin="5,0,5,0" Padding="2" Visibility="Collapsed">
+
+                <Button x:Name="btnAddText" Click="BtnAddText_Click" ToolTip="Add text">
+                    <Image Source="/Assets/addtextICON.png" Width="28" Height="28" />
+                </Button>
+
+                <Button x:Name="btnCrop" Click="BtnCrop_Click" ToolTip="Crop document">
+                    <Image Source="/Assets/cropICON.png" Width="28" Height="28" />
+                </Button>
+
+                <Button x:Name="btnSign" Click="BtnSign_Click" ToolTip="Sign">
+                    <Image Source="/Assets/signICON.png" Width="28" Height="28" />
+                </Button>
+
+                <Button x:Name="btnRemove" Click="BtnRemove_Click" ToolTip="Remove">
+                    <Image Source="/Assets/removeICON.png" Width="28" Height="28" />
+                </Button>
+
+                <Button x:Name="btnSave" Click="BtnSave_Click" ToolTip="Save">
+                    <Image Source="/Assets/saveICON.png" Width="28" Height="28" />
+                </Button>
+
+            </ToolBar>
+
+            <wv2:WebView2 x:Name="pdfWebView" Grid.Row="1" />
 
             <TextBlock x:Name="placeholderText" 
-               Text="no document selected" 
+               Grid.Row="1" Text="no document selected" 
                HorizontalAlignment="Center" 
                VerticalAlignment="Center" 
                FontSize="20" 
-               Foreground="Gray" />
+               Foreground="Gray"/>
         </Grid>
     </Grid>
 </Window>

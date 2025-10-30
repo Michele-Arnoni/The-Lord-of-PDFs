@@ -10,7 +10,7 @@ using System.Linq;
 using System.Windows.Input;
 
 
-namespace The_Lord_of_PDFs
+namespace PDFs_castle
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -613,11 +613,15 @@ namespace The_Lord_of_PDFs
                 placeholderText.Visibility = Visibility.Visible;
                 pdfWebView.Source = new Uri("about:blank"); // clear the WebView
                 pdfWebView.Visibility = Visibility.Collapsed;
+
+                pdfEditorToolBar.Visibility = Visibility.Collapsed; //hide the toolbar
             }
             else
             {
                 placeholderText.Visibility = Visibility.Collapsed;
                 pdfWebView.Visibility = Visibility.Visible;
+
+                pdfEditorToolBar.Visibility = Visibility.Visible; //show the toolbar
             }
         }
 
@@ -773,6 +777,34 @@ namespace The_Lord_of_PDFs
                 // on error, reload the vault contents to ensure UI consistency
                 LoadVaultContents();
             }
+        }
+
+
+
+        // TOOLBAR SECTION: PDF editing functionalities 
+        private void BtnAddText_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Logica 'Aggiungi Testo' da implementare.");
+        }
+
+        private void BtnCrop_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Logica 'Ritaglia' da implementare.");
+        }
+
+        private void BtnSign_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Logica 'Firma' da implementare.");
+        }
+
+        private void BtnRemove_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Logica 'Rimuovi' da implementare.");
+        }
+
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Logica 'Salva' da implementare.");
         }
     }
 }

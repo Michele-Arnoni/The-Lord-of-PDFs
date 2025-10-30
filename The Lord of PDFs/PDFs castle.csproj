@@ -10,13 +10,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\addtextICON.png" />
     <None Remove="Assets\castleICON.png" />
+    <None Remove="Assets\cropICON.png" />
     <None Remove="Assets\flameICON.png" />
     <None Remove="Assets\folderICON.png" />
     <None Remove="Assets\importpdfICON.png" />
     <None Remove="Assets\newfolderICON.png" />
     <None Remove="Assets\pdfICON.png" />
+    <None Remove="Assets\removeICON.png" />
+    <None Remove="Assets\saveICON.png" />
     <None Remove="Assets\scannerICON.png" />
+    <None Remove="Assets\signICON.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,13 +29,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\addtextICON.png" />
     <Resource Include="Assets\castleICON.png" />
+    <Resource Include="Assets\cropICON.png" />
     <Resource Include="Assets\flameICON.png" />
     <Resource Include="Assets\folderICON.png" />
     <Resource Include="Assets\importpdfICON.png" />
     <Resource Include="Assets\newfolderICON.png" />
     <Resource Include="Assets\pdfICON.png" />
+    <Resource Include="Assets\removeICON.png" />
+    <Resource Include="Assets\saveICON.png" />
     <Resource Include="Assets\scannerICON.png" />
+    <Resource Include="Assets\signICON.png" />
   </ItemGroup>
 
 </Project>

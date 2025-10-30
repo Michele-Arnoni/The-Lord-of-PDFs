@@ -1,7 +1,7 @@
-﻿<Application x:Class="The_Lord_of_PDFs.App"
+﻿<Application x:Class="PDFs_castle.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:The_Lord_of_PDFs"
+             xmlns:local="clr-namespace:PDFs_castle"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace The_Lord_of_PDFs
+namespace PDFs_castle
 {
     /// <summary>
     /// Interaction logic for App.xaml
