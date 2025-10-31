@@ -8,8 +8,9 @@
   - Web pdf viewer: microsoft edge in-app implementation, you can view, rotate, print and save your pdfs.  
       A PDF is rendered by the WebView2 engine, essentially a little Microsoft Edge inside the software.  
   
-  - Pdf editor: crop, labels and sign.   
-      Work in progress...  
+  - Pdf editor: crop, labels, sign...
+      Build a simple pdf editor is too expensive, for this reason I opted a delegation to orher software the user can choose.
+      Essentially, you can choose your favorite pdf editor to use.
 
 # HOW IT WORKS:
   - C#
